@@ -20,13 +20,13 @@ public class DeadLock {
         DeadLock first = new DeadLock("first"),
                 second = new DeadLock("second");
 
-        Future<?> firstFuture = executorService.submit(getRunnable(first, second)),
-                secondFuture = executorService.submit(getRunnable(second, first));
+        Future<?> firstFuture = executorService.submit(getRunnableInterruptibility(first, second)),
+                secondFuture = executorService.submit(getRunnableInterruptibility(second, first));
 
         Thread.sleep(5000);
         firstFuture.cancel(true);
         secondFuture.cancel(true);
-        executorService.shutdownNow();
+        executorService.shutdown();
     }
 
     private static Runnable getRunnable(DeadLock first, DeadLock second) {

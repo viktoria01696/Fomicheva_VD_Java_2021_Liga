@@ -24,10 +24,11 @@ public class Main {
         /// Более удачные оформления вывода в консоль приветствуются
 
         File myFile = new File("src/");
-        System.out.println(printDirectories(myFile));
+        System.out.println(printDirectories(myFile, 0));
     }
 
-    public static String printDirectories(File filePath) {
+    public static String printDirectories(File filePath, int index) {
+
         stringBuilder.append(getPackageLevel(index))
                 .append("+--")
                 .append(filePath.getName())
@@ -35,8 +36,7 @@ public class Main {
                 .append("\n");
         for (File file : Objects.requireNonNull(filePath.listFiles())) {
             if (file.isDirectory()) {
-                index++;
-                printDirectories(file);
+                printDirectories(file, index + 1);
             } else {
                 printFile(file, index + 1);
             }
@@ -52,7 +52,7 @@ public class Main {
     }
 
     private static String getPackageLevel(int index) {
-        return "|  ".repeat(Math.max(0, index));
+        return "|  ".repeat(index);
     }
 
 }

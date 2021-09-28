@@ -27,10 +27,13 @@ public class Counter {
     }
 
     static CompletableFuture<Void> runCounting(ExecutorService executorService) {
-        return CompletableFuture.runAsync(() -> {
-            for (int i = 0; i < 1000000; i++) {
-                Counter.counter = Counter.counter + 1;
-            }
-        }, executorService);
+        return CompletableFuture.runAsync(Counter::counting, executorService);
     }
+
+    public static synchronized  void counting() {
+        for (int i = 0; i < 1000000; i++) {
+            Counter.counter = Counter.counter + 1;
+        }
+    }
+
 }

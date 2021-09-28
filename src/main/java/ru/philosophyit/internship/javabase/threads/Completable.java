@@ -5,6 +5,9 @@ import java.util.function.Function;
 
 public class Completable {
     // Почему в выводе нет "Hello world"?
+    //необходимо явно вызвать результат работы потока, порождаемого CompletableFuture, что может быть сделано,
+    //к примеру, при помощи метода join()
+
     public static void main(String[] args) {
         CompletableFuture.supplyAsync(() -> {
             try {
@@ -26,5 +29,6 @@ public class Completable {
         }))
         .thenApply(Function.identity())
         .thenAccept(System.out::println);
+
     }
 }
