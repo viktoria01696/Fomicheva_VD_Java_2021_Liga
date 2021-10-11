@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id "org.gretty" version "3.0.5"
+}
+
+gretty {
+    servletContainer = 'tomcat9'
+    contextPath = '/'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'javax.websocket:javax.websocket-api:1.1'
+    implementation 'com.google.code.gson:gson:2.8.8'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WS demo</title>
+    <script src="ws.js"></script>
+    <style>
+        .msg-login {
+            width: 100px;
+            display: inline-block;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id = "title"><h1>чЯтик</h1></div>
+    <div id = "login">
+        <input type="text" id = "name"/>
+        <input type="button" value="войти" id = "name-enter"/>
+    </div>
+    <div id = "chat" style = "display: none">
+        <div id = "chat-box"></div>
+        <div id = "input-box">
+            <label for="input">Введите текст:</label>
+            <input type = "text" id = "input"/>
+            <input type="button" value="отправить" id = "send"/>
+        </div>
+    </div>
+</body>
+</html>
