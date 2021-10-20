@@ -20,11 +20,12 @@ public class StudentMapper extends AbstractMapper<Student, StudentDto> {
     private final SchoolRepository schoolRepository;
     private final PostRepository postRepository;
     private final ChatRepository chatRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
     public StudentMapper(ModelMapper mapper, MessageRepository messageRepository,
                          StudentRepository studentRepository, SchoolRepository schoolRepository,
-                         PostRepository postRepository, ChatRepository chatRepository) {
+                         PostRepository postRepository, ChatRepository chatRepository, RoleRepository roleRepository) {
         super(mapper, Student.class, StudentDto.class);
         this.mapper = mapper;
         this.messageRepository = messageRepository;
@@ -32,12 +33,14 @@ public class StudentMapper extends AbstractMapper<Student, StudentDto> {
         this.schoolRepository = schoolRepository;
         this.postRepository = postRepository;
         this.chatRepository = chatRepository;
+        this.roleRepository = roleRepository;
     }
 
     @PostConstruct
     public void setupMapper() {
         mapper.createTypeMap(Student.class, StudentDto.class)
                 .addMappings(m -> m.skip(StudentDto::setSchoolId))
+                .addMappings(m -> m.skip(StudentDto::setRoleId))
                 .addMappings(m -> m.skip(StudentDto::setPostIdList))
                 .addMappings(m -> m.skip(StudentDto::setMessageIdList))
                 .addMappings(m -> m.skip(StudentDto::setChatIdList))
@@ -45,6 +48,7 @@ public class StudentMapper extends AbstractMapper<Student, StudentDto> {
                 .setPostConverter(toDtoConverter());
         mapper.createTypeMap(StudentDto.class, Student.class)
                 .addMappings(m -> m.skip(Student::setSchool))
+                .addMappings(m -> m.skip(Student::setRole))
                 .addMappings(m -> m.skip(Student::setPostList))
                 .addMappings(m -> m.skip(Student::setMessageList))
                 .addMappings(m -> m.skip(Student::setChatList))
@@ -56,6 +60,8 @@ public class StudentMapper extends AbstractMapper<Student, StudentDto> {
     public void mapSpecificFieldsInDtoConverter(Student source, StudentDto destination) {
         destination.setSchoolId(Objects.isNull(source.getSchool()) ?
                 null : source.getSchool().getId());
+        destination.setRoleId(Objects.isNull(source.getRole()) ?
+                null : source.getRole().getId());
         destination.setPostIdList(Objects.isNull(source.getPostList()) ?
                 null : source.getPostList().stream().map(Post::getId).collect(Collectors.toList()));
         destination.setMessageIdList(Objects.isNull(source.getMessageList()) ?
@@ -69,8 +75,11 @@ public class StudentMapper extends AbstractMapper<Student, StudentDto> {
     @Override
     public void mapSpecificFieldsInEntityConverter(StudentDto source, Student destination) {
         Optional<School> school = schoolRepository.findById(source.getSchoolId());
+        Optional<Role> role = roleRepository.findById(source.getRoleId());
         destination.setSchool(Objects.isNull(source.getSchoolId()) ?
                 null : school.orElse(null));
+        destination.setRole(Objects.isNull(source.getRoleId()) ?
+                null : role.orElse(null));
         destination.setPostList(Objects.isNull(source.getPostIdList()) ?
                 null : source.getPostIdList().stream().map(postRepository::findById).map(m -> m.orElse(null))
                 .collect(Collectors.toList()));

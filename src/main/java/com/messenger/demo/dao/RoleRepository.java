@@ -1,7 +1,6 @@
 package com.messenger.demo.dao;
 
 import com.messenger.demo.entity.Role;
-import com.messenger.demo.entity.Student;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ChatService {
 
-    void createNewChat(Long studentId, ChatDto chatDto);
+    void createNewChat(String login, ChatDto chatDto);
 
     void deleteChat(Long chatId);
 

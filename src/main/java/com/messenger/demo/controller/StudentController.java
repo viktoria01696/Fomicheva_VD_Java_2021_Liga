@@ -1,15 +1,19 @@
 package com.messenger.demo.controller;
 
 import com.messenger.demo.dto.ChatDto;
+import com.messenger.demo.dto.MessageDto;
 import com.messenger.demo.dto.PostDto;
 import com.messenger.demo.dto.StudentDto;
 import com.messenger.demo.service.ChatService;
+import com.messenger.demo.service.MessageService;
 import com.messenger.demo.service.PostService;
 import com.messenger.demo.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 
@@ -21,13 +25,24 @@ public class StudentController {
     private final StudentService studentService;
     private final PostService postService;
     private final ChatService chatService;
+    private final MessageService messageService;
 
-    @GetMapping("/all")
-    public List<StudentDto> getStudentsList() {
-        return studentService.findAllStudents();
+    @GetMapping("/my-profile")
+    public StudentDto getCurrentProfile(Principal principal) {
+        return studentService.findStudentByLogin(principal.getName());
     }
 
-    //TODO: расширить метод после добавления фронта
+    @GetMapping("/{id}")
+    public StudentDto getStudentProfile(@PathVariable("id") Long id) {
+        return studentService.findStudentById(id);
+    }
+
+    @GetMapping("/all")
+    public List<StudentDto> getStudentsList(@RequestParam("size") Integer pageSize, @RequestParam("page") Integer pageNumber,
+                                            @RequestParam("sort") String sort) {
+        return studentService.findAllStudents(pageSize, pageNumber, sort);
+    }
+
     @GetMapping("/new")
     public StudentDto createNewStudent() {
         return studentService.getNewStudent();
@@ -38,14 +53,10 @@ public class StudentController {
         studentService.saveStudent(studentDto);
     }
 
+    @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable("id") Long id) {
         studentService.deleteStudentById(id);
-    }
-
-    @GetMapping("/{id}")
-    public StudentDto getStudentProfile(@PathVariable("id") Long id) {
-        return studentService.findStudentById(id);
     }
 
     @GetMapping("/{id}/friends")
@@ -53,14 +64,24 @@ public class StudentController {
         return studentService.getFriendsByStudentId(id);
     }
 
-    @PostMapping("/{id}/friends")
-    public void addFriend(@PathVariable("id") Long id, @RequestParam("friend_id") Long friendId) {
-        studentService.addNewFriend(id, friendId);
+    @GetMapping("/my-profile/friends")
+    public List<StudentDto> getFriendsList(Principal principal) {
+        return studentService.getFriendsByStudentLogin(principal.getName());
     }
 
-    @DeleteMapping("/{id}/friends/{friend_id}")
-    public void deleteFriend(@PathVariable("id") Long id, @PathVariable("friend_id") Long friendId) {
-        studentService.deleteFriend(id, friendId);
+    @PostMapping("/my-profile/friends")
+    public void addFriend(Principal principal, @RequestParam("friend_id") Long friendId) {
+        studentService.addNewFriend(principal.getName(), friendId);
+    }
+
+    @DeleteMapping("/my-profile/friends/{friend_id}")
+    public void deleteFriend(Principal principal, @PathVariable("friend_id") Long friendId) {
+        studentService.deleteFriend(principal.getName(), friendId);
+    }
+
+    @GetMapping("/my-profile/posts")
+    public List<PostDto> getCurrentStudentPosts(Principal principal) {
+        return studentService.getPostsByStudentLogin(principal.getName());
     }
 
     @GetMapping("/{id}/posts")
@@ -68,28 +89,40 @@ public class StudentController {
         return studentService.getPostsByStudentId(id);
     }
 
-    @PostMapping("/{id}/posts")
-    public void addNewPost(@PathVariable("id") Long studentId, @Valid @RequestBody PostDto postDto) {
-        postService.createNewPost(studentId, postDto);
+    @PostMapping("/my-profile/posts")
+    public void addNewPost(Principal principal, @Valid @RequestBody PostDto postDto) {
+        postService.createNewPost(principal.getName(), postDto);
     }
 
-    @DeleteMapping("/{id}/posts/{post_id}")
-    public void deletePost(@PathVariable("id") Long studentId, @PathVariable("post_id") Long postId) {
-        postService.deletePost(studentId, postId);
+    @DeleteMapping("/my-profile/posts/{post_id}")
+    public void deletePost(Principal principal, @PathVariable("post_id") Long postId) {
+        postService.deletePost(principal.getName(), postId);
     }
 
-    @GetMapping("/{id}/chats")
-    public List<ChatDto> getStudentChats(@PathVariable("id") Long id) {
-        return studentService.getChatsByStudentId(id);
+    @GetMapping("/my-profile/chats")
+    public List<ChatDto> getStudentChats(Principal principal) {
+        return studentService.getChatsByStudentLogin(principal.getName());
     }
 
-    @PostMapping("/{id}/chats")
-    public void addNewChat(@PathVariable("id") Long studentId, @Valid @RequestBody ChatDto chatDto) {
-        chatService.createNewChat(studentId, chatDto);
+    @PostMapping("/my-profile/chats")
+    public void addNewChat(Principal principal, @Valid @RequestBody ChatDto chatDto) {
+        chatService.createNewChat(principal.getName(), chatDto);
     }
 
-    @DeleteMapping("/chats/{chat_id}")
+    @DeleteMapping("/my-profile/chats/{chat_id}")
     public void deleteChat(@PathVariable("chat_id") Long chatId) {
         chatService.deleteChat(chatId);
+    }
+
+    @PostMapping("/my-profile/{chat_id}/messages")
+    public void addNewMessage(Principal principal, @PathVariable("chat_id") Long chatId,
+                              @Valid @RequestBody MessageDto messageDto) {
+        messageService.createNewMessage(principal.getName(), chatId, messageDto);
+    }
+
+    @DeleteMapping("/my-profile/{chat_id}/messages/{message_id}")
+    public void deleteMessage(Principal principal, @PathVariable("chat_id") Long chatId,
+                              @PathVariable("message_id") Long messageId) {
+        messageService.deleteMessage(principal.getName(), chatId, messageId);
     }
 }

@@ -83,7 +83,7 @@ public class Student {
             inverseJoinColumns = @JoinColumn(name = "chat_id"))
     private List<Chat> chatList;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "friendship",
             joinColumns = @JoinColumn(name = "first_member_id", referencedColumnName = "student_id"),
             inverseJoinColumns = @JoinColumn(name = "second_member_id", referencedColumnName = "student_id"))

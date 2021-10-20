@@ -4,6 +4,7 @@ package com.messenger.demo.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
+@Log
 public class JWTUtil {
 
     @Value("${jwt.secret}")
@@ -38,12 +40,12 @@ public class JWTUtil {
 
     public String extractAuthorities(String token) {
         Function<Claims, String> claimsListFunction = claims -> {
-            return (String)claims.get("authorities");
+            return (String) claims.get("authorities");
         };
         return extractClaim(token, claimsListFunction);
     }
 
-    private  <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -63,4 +65,5 @@ public class JWTUtil {
     private Date expireTimeFromNow() {
         return new Date(System.currentTimeMillis() + sessionTime);
     }
+
 }

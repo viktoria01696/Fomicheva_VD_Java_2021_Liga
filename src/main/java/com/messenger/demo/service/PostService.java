@@ -5,9 +5,9 @@ import com.messenger.demo.entity.Post;
 
 public interface PostService {
 
-    void createNewPost(Long studentId, PostDto postDto);
+    void createNewPost(String login, PostDto postDto);
 
-    void deletePost(Long studentId, Long postId);
+    void deletePost(String login, Long postId);
 
     Post findPostEntityById(Long id);
 

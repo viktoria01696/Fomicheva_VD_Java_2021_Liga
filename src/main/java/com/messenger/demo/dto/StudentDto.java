@@ -50,6 +50,9 @@ public class StudentDto {
     private Integer sex;
 
     @NotNull
+    private Integer roleId;
+
+    @NotNull
     private Long schoolId;
 
     private List<Long> postIdList;

@@ -2,11 +2,12 @@ package com.messenger.demo.config;
 
 
 import com.messenger.demo.security.JWTFilter;
-import com.messenger.demo.security.JwtAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -21,27 +22,33 @@ import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final PasswordEncoder passwordEncoder;
+
     private final UserDetailsService userDetailsService;
     private final JWTFilter jwtFilter;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    @Setter
+    private PasswordEncoder passwordEncoder;
 
-
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("student")
-                .password(passwordEncoder.encode("123"))
-                .roles("USER");
-        auth.inMemoryAuthentication()
-                .withUser("admin")
-                .password(passwordEncoder.encode("123"))
-                .roles("ADMIN");
-        //auth.userDetailsService(userDetailsService);
+//        auth.inMemoryAuthentication()
+//                .withUser("student")
+//                .password(passwordEncoder.encode("123"))
+//                .roles("USER");
+//        auth.inMemoryAuthentication()
+//                .withUser("admin")
+//                .password(passwordEncoder.encode("123"))
+//                .roles("ADMIN");
+        auth.userDetailsService(userDetailsService);
     }
 
     @Override
@@ -51,23 +58,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .anonymous().disable()
                 .authorizeRequests()
+                .antMatchers("/**").hasRole("USER")
                 .anyRequest().authenticated()
-
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
                 .and()
                 .formLogin()
-                //.usernameParameter("login")
-                .defaultSuccessUrl("/student/all")
-                .successHandler(authenticationSuccessHandler)
                 .failureHandler((req, resp, e) -> resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
-
-//                .and()
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        ;
+                .successHandler(authenticationSuccessHandler)
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
-
 
 }
