@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
@@ -43,7 +44,6 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<StudentDto> findAllStudents(Integer pageSize, Integer pageNumber, String sort) {
         String[] sortParams = sort.split(",");
         Pageable sortedByPriceDesc = null;
@@ -82,26 +82,22 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public StudentDto findStudentById(Long id) {
         return studentMapper.toDto(studentService.findStudentEntityById(id));
     }
 
     @Override
-    @Transactional(readOnly = true)
     public StudentDto findStudentByLogin(String login) {
         return studentMapper.toDto(studentService.findStudentEntityByLogin(login));
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<StudentDto> getFriendsByStudentId(Long id) {
         Student student = studentService.findStudentEntityById(id);
         return student.getFriendList().stream().map(studentMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<StudentDto> getFriendsByStudentLogin(String login) {
         Student student = studentService.findStudentEntityByLogin(login);
         return student.getFriendList().stream().map(studentMapper::toDto).collect(Collectors.toList());
@@ -137,34 +133,31 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<PostDto> getPostsByStudentId(Long id) {
         Student student = studentService.findStudentEntityById(id);
         return student.getPostList().stream().map(postMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<PostDto> getPostsByStudentLogin(String login) {
         Student student = studentService.findStudentEntityByLogin(login);
         return student.getPostList().stream().map(postMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ChatDto> getChatsByStudentLogin(String login) {
         Student student = studentService.findStudentEntityByLogin(login);
         return student.getChatList().stream().map(chatMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Student findStudentEntityById(Long id) {
         return studentRepository.findById(id).orElseThrow(StudentNotFoundException::new);
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Student findStudentEntityByLogin(String login) {
         return Optional.of(studentRepository.findByLogin(login)).orElseThrow(StudentNotFoundException::new);
     }

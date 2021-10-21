@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
@@ -56,7 +57,6 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<StudentDto> getChatMembers(Long id) {
         Chat chat = chatService.findChatEntityById(id);
         return chat.getStudentList().stream().map(studentMapper::toDto).collect(Collectors.toList());
@@ -79,14 +79,13 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<MessageDto> getMessages(Long id) {
         Chat chat = chatService.findChatEntityById(id);
         return chat.getMessageList().stream().map(messageMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Chat findChatEntityById(Long id) {
         return chatRepository.findById(id).orElseThrow(ChatNotFoundException::new);
     }
